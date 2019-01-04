@@ -37,15 +37,18 @@ void Linked_list::add_item(string tag, int value) {
 void Linked_list::remove_item(string tag) {
     Linked_inner *curr = this -> list;
     Linked_inner *prev = NULL;
+    bool found_tag = false;
     while(curr) {
         string this_tag = curr -> tag;
-        if (this_tag.compare(tag) == 0) 
+        if (this_tag.compare(tag) == 0) {
+            found_tag = true;
             break;
+        }
         prev = curr;
         curr = curr -> next;
     }
-
-    if (curr && !prev) {
+    if (found_tag) {
+        if (curr && !prev) {
         // This is the first element
         Linked_inner *next = curr -> next;
         curr -> next = NULL;
@@ -64,6 +67,7 @@ void Linked_list::remove_item(string tag) {
         delete curr;
         this -> size--;
         prev -> next = NULL;
+        }
     }
 }
 
@@ -164,10 +168,9 @@ int* Linked_list::from_index(int index) {
             int *val = new int;
             *val = curr -> value;
             return val;
-        } else {
-            return NULL;
         }
     }
+    return NULL;
 }
 
 /* Compares two Linked List objects for structural equality. */

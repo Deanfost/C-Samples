@@ -52,14 +52,14 @@ class Expandable_array {
     public:
         Expandable_array();
         Expandable_array(int initial_size);
-        ~Expandable_array();
+        // ~Expandable_array();
         void add_value(int item);
         void remove_value(int index);
         void edit_value(int index, int new_value);
-        int get_size();
+        int get_item_count();
         int get_capacity();
         void resize(int new_size);
-        int* to_array();
+        int* to_array(int *out_size);
         int* value_at(int index);
         int count_similar(int value);
         bool equal_to(Expandable_array other);

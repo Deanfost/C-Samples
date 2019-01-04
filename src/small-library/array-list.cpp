@@ -12,14 +12,13 @@ Expandable_array::Expandable_array() {
 }
 
 Expandable_array::Expandable_array(int initial_size) {
-    this -> array = new int[initial_size];
+    if (initial_size > 0)
+        this -> array = new int[initial_size];
+    else 
+        this -> array = new int[ARR_INCR_SIZE];
+    
     this -> item_count = 0;
     this -> capacity = initial_size;
-}
-
-/* Destructor for the array. */
-Expandable_array::~Expandable_array() {
-    delete [] this -> array;
 }
 
 /* Appends a value to the Array List. */
@@ -48,21 +47,25 @@ void Expandable_array::add_value(int item) {
 void Expandable_array::remove_value(int index) {
     if (this -> array) {
         if (index >= 0 && index < this -> item_count) {
-            this -> array[index] = 0;
-            for (int i = index; i < item_count; i++) {
-                
+            for (int i = index; i < this -> item_count - 1; i++) {
+                this -> array[i] = this -> array[i + 1];
             }
+            this -> item_count--;
         }   
     }
 }
 
 /* Edits the value at the given index. */
 void Expandable_array::edit_value(int index, int new_value){
-    
+    if (this -> array) {
+        if (index >= 0 && index < this -> item_count) {
+            this -> array[index] = new_value;
+        }
+    }
 }
 
 /* Returns the size of the Array List. */
-int Expandable_array::get_size() {
+int Expandable_array::get_item_count() {
     return this -> item_count;
 }
 
@@ -73,27 +76,81 @@ int Expandable_array::get_capacity() {
 
 /* Explicitly resizes the Array List. */
 void Expandable_array::resize(int new_size) {
-
+    if (new_size > 0) {
+        if (new_size < this -> item_count) {
+            // Allocate a new array, copy over as many elems as possible
+            int *new_arr = new int[new_size];
+            for (int i = 0; i < new_size; i++) {
+                new_arr[i] = this -> array[i];
+            }
+            delete this -> array;
+            this -> array = new_arr;
+            this -> capacity = new_size;
+            this -> item_count = new_size;
+        } else {
+            // Normal resize
+            this -> array = (int *) realloc(this -> array, new_size * sizeof(int));
+            this -> capacity = new_size;
+        }
+    }
 }
 
 /* Returns a deep-copy of the stored array. */
-int* Expandable_array::to_array() {
-    return NULL;
+int* Expandable_array::to_array(int *out_size) {
+    if (this -> array) {
+        int *copy = new int[this -> item_count];
+        for (int i = 0; i < this -> item_count; i++) {
+            copy[i] = this -> array[i];
+        }
+        *out_size = this -> item_count;
+        return copy;
+    } else {
+        return NULL;
+    }
 }
 
 /* Returns the value at the given index. */
 int* Expandable_array::value_at(int index) {
+    if (this -> array) {
+        if (index >= 0 && index < this -> item_count) {
+            int *i = new int;
+            *i = this -> array[index];
+            return i;
+        }
+    }
     return NULL;
 }
 
 /* Returns the amount of times the given value appears in the list. */
 int Expandable_array::count_similar(int value) {
-    return 0;
+    int count = 0;
+    if (this -> array) {
+        for (int i = 0; i < this -> item_count; i++) {
+            if (this -> array[i] == value) {
+                count ++;
+            }
+        }
+    }
+    return count;
 }
 
-/* Compares two Array List objects for structural equality. */
+/* Compares two Array List objects for data equality. */
 bool Expandable_array::equal_to(Expandable_array other) {
-    return 0;
+    // Check stored array existence and item count
+    if ((!this -> array && other.array) || (this -> array && !other.array)) {
+        return false;
+    }
+    if (this -> item_count != other.item_count) {
+        return false;
+    }
+    // Compare all items
+    for (int i = 0; i < this -> item_count; i++) {
+        if (this -> array[i] != other.array[i]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 /* Prints the elements in the Array List. */
